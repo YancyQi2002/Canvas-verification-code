@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>canvas生成验证码</title>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css" integrity="sha512-oHDEc8Xed4hiW6CxD7qjbnI+B07vDdX7hEPTvn9pSZO1bcRqHp8mj9pyr+8RVC2GmtEfI2Bi9Ke9Ass0as+zpg==" crossorigin="anonymous" />
+		<link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/4.1.0/css/bootstrap.min.css">
+		<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+		<script src="https://cdn.bootcss.com/popper.js/1.12.5/umd/popper.min.js"></script>
+		<script src="https://cdn.bootcss.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.5.4/cjs/popper.js" integrity="sha512-eYSxaCG6aI6iXljwQfAK6tk7PWSZhOKqyvk3mxxX8/1uevu/73bcNG7RCck7mdVRWp4LB21SB2O91gD4yYeZuw==" crossorigin="anonymous"></script>
+	</head>
+	<body>
+		<!-- 参照B站视频BV1T64y1f7kM UP @ 老陈打码 -->
+		<div>
+			<form style="margin-left:500px;margin-top:200px;" onsubmit="return checkForm()">
+			    <div class="form-group">
+					<label for="username" stype="display:inline;">账户：</label>
+			        <input type="text" class="form-control" name="username" id="username" placeholder="User Name" style="display:inline;width:200px;margin-left:16px;" autocomplete="off" />
+					<!--错误反馈-->
+					<div class="invalid-feedback" id="username-feedback"></div>
+				</div>
+			    <div class="form-group">
+					<label for="password" style="display:inline;">密码：</label>
+			        <input type="password" class="form-control" name="password" id="password" placeholder="Password" style="display:inline;width:200px;margin-left:16px"autocomplete="off" />
+			    </div>
+				<div class="form-group">
+					<label for="text" style="display:inline;">验证码：</label>
+				    <input type="text" class="form-control" id="password" style="display:inline;width:200px;"autocomplete="off" />
+					<canvas id="canvas" width="120" height="40" style="margin-bottom: -12px;"></canvas>
+				</div>
+			    <button type="submit" class="btn btn-primary" onclick="login()">登录</button>
+			    <button type="submit" class="btn btn-primary" onclick="register()">注册</button>
+			</form>
+		</div>
+		<script type="text/javascript">
+			
+			function verifyCode(selector,vWidth,vHight) {
+				// 随机数的生成函数
+				function randNumber(min,max) {
+					return parseInt(Math.random() * (max - min) + min)
+				}
+				
+				// 随机生成颜色
+				function randColor(min,max) {
+					var cred = randNumber(min,max)
+					var cgreen = randNumber(min,max)
+					var cblue = randNumber(min,max)
+					return `rgb(${cred},${cgreen},${cblue})`
+				}
+				
+				var vWidth = vWidth
+				var vHight = vHight
+				var canvas = document.querySelector(selector)
+				var ctx = canvas.getContext('2d')
+				// 在canvas上绘制背景颜色
+				// console.log(randColor(180,230))
+				ctx.fillStyle = randColor(180,230)
+				ctx.fillRect(0,0,vWidth,vHight)
+				
+				// 随机字符串
+				var pool = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
+				var result = ""
+				
+				for (let i = 0; i < 4; i++ ) {
+					// 取出随机的字母或数字
+					var count = pool[randNumber(0,pool.length)]
+					// 随机字体大小
+					var countfontsize = randNumber(18,40)
+					// 随机旋转角度
+					var countdeg = randNumber(-30,30)
+					ctx.font = countfontsize + "px 'centory gothic' "
+					ctx.textBaseline = 'top'
+					// 设置字体的填充颜色
+					ctx.fillStyle = randColor(80,150)
+					ctx.save()
+					ctx.translate(30 * i + 15,15)
+					ctx.rotate(countdeg * Math.PI / 180)
+					ctx.fillText(count,-10,-10)
+					ctx.restore()
+					result += count
+				}
+				
+				// 随机生成干扰线
+				for (let i = 0; i < 5; i++) {
+					ctx.beginPath()
+					ctx.moveTo(randNumber(0,vWidth),randNumber(0,vHight))
+					ctx.lineTo(randNumber(0,vWidth),randNumber(0,vHight))
+					ctx.strokeStyle = randColor(180,230)
+					ctx.closePath()
+					ctx.stroke()
+				}
+				
+				// 随机产生40个小的干扰圆点
+				for (let i = 0; i < 40; i++) {
+					ctx.beginPath()
+					ctx.arc(randNumber(0,vWidth),randNumber(0,vHight),1,0,2 * Math.PI)
+					ctx.closePath()
+					ctx.fillStyle = randColor(150,200)
+					ctx.fill()
+				}
+				return result
+			}
+			
+			let yzm = verifyCode('#canvas',120,40)
+			console.log(yzm)
+			
+			//检查用户名不能为空不能有特殊符号
+			function checkForm() {
+			    var username = document.getElementById("username");
+			    var feedback = document.getElementById("username-feedback");
+			    //不能为空
+			    if(username.value==""){
+			        feedback.innerHTML = "用户名为空！";//修改username-feedback div中的内容
+			        username.classList.remove("is-valid");//清除合法状态
+			        username.classList.add("is-invalid");//添加非法状态
+			        return false;//onsubmit  return false阻止表单提交
+			    }
+			    //不能有特殊符号
+			    var patrn = /[@#\$%\^&\*]+/g;//正则表达式
+			    if(patrn.exec(username.value)){
+			        feedback.innerHTML = "用户名不能存在特殊符号！";
+			        username.classList.remove("is-valid");
+			        username.classList.add("is-invalid");
+			        return false;
+			    }
+			    //清除错误提示，改成成功提示
+			    username.classList.remove("is-invalid");
+			    username.classList.add("is-valid");
+			    feedback.innerHTML="";
+			    return true;
+			}
+			
+			function register() {
+			    // 跳转到注册界面register.html进行注册
+			    window.open("register.html", "_blank");  // _self,_parent,_top,_blank
+			}
+		</script>
+	</body>
+</html>

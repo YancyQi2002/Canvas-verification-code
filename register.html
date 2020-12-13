@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>注册界面</title>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css" integrity="sha512-oHDEc8Xed4hiW6CxD7qjbnI+B07vDdX7hEPTvn9pSZO1bcRqHp8mj9pyr+8RVC2GmtEfI2Bi9Ke9Ass0as+zpg==" crossorigin="anonymous" />
+		<link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/4.1.0/css/bootstrap.min.css">
+		<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.5.4/cjs/popper.js" integrity="sha512-eYSxaCG6aI6iXljwQfAK6tk7PWSZhOKqyvk3mxxX8/1uevu/73bcNG7RCck7mdVRWp4LB21SB2O91gD4yYeZuw==" crossorigin="anonymous"></script>
+		<script src="https://cdn.bootcss.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+	</head>
+	<body>
+		<!-- 注册表单 -->
+		<form style="margin-left:500px;margin-top:200px;" onsubmit="return checkForm()">
+			<div class="form-group">
+				<label for="username" stype="display:inline;">账户：</label>
+				<input type="text" class="form-control" name="username" id="username" placeholder="User Name" style="display:inline;width:200px;margin-left:16px;" autocomplete="off" />
+				<!--错误反馈-->
+				<div class="invalid-feedback" id="username-feedback"></div>
+			</div>
+			<div class="form-group">
+				<label for="password" style="display:inline;">密码：</label>
+				<input type="password" class="form-control" id="password" placeholder="Password" style="display:inline;width:200px;margin-left:16px;" autocomplete="off" />
+			</div>
+			<button type="submit" class="btn btn-primary" onclick="register()">确认注册</button>
+		</form>
+		
+		<script type="text/javascript">
+			// 检查用户名不能为空不能有特殊符号，验证码不为空，输入的验证码要与图示相同
+			function checkForm() {
+			    var username = document.getElementById("username");
+			    var feedback = document.getElementById("username-feedback");
+			    // 账户不能为空
+			    if(username.value == ""){
+			        feedback.innerHTML = "用户名为空！";//修改username-feedback div中的内容
+			        username.classList.remove("is-valid");//清除合法状态
+			        username.classList.add("is-invalid");//添加非法状态
+			        return false;//onsubmit  return false阻止表单提交
+			    }
+			    // 不能有特殊符号
+			    var patrn = /[@#\$%\^&\*]+/g;//正则表达式
+			    if(patrn.exec(username.value)){
+			        feedback.innerHTML = "用户名不能存在特殊符号！";
+			        username.classList.remove("is-valid");
+			        username.classList.add("is-invalid");
+			        return false;
+			    }
+			    //清除错误提示，改成成功提示
+			    username.classList.remove("is-invalid");
+			    username.classList.add("is-valid");
+			    feedback.innerHTML="";
+			    return true;
+			}
+		</script>
+	</body>
+</html>
